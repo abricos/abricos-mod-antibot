@@ -18,8 +18,9 @@ class AntibotModule extends Ab_Module {
 	 * Конструктор
 	 */
 	public function __construct(){
-		$this->version = "0.1";
+		$this->version = "0.1.0.1";
 		$this->name = "antibot";
+		$this->takelink = "antibot"; // нужен для передачи списка блокировки другим сайтам
 		$this->permission = new AntibotPermission($this);
 	}
 	
@@ -45,11 +46,16 @@ class AntibotModule extends Ab_Module {
 	 */
 	public function UserDataUpdate() {
 		require_once 'includes/dbquery.php';
-		$id = AntibotQuery::UserIPAppend(Abricos::$db, Abricos::$user->id, $this->GetIP()); 
+		$isapp = AntibotQuery::UserIPAppend(Abricos::$db, Abricos::$user->id, $this->GetIP());
+
+		if ($isapp > 0){ 
+			// TODO: добавлена запись о юзере, значит нужно проверить всех юзеров на принадлежность к ботам 
+		}
 	}
 }
 
 class AntibotAction {
+	const VIEW	= 10;
 	const ADMIN	= 50;
 }
 
@@ -59,6 +65,9 @@ class AntibotPermission extends Ab_UserPermission {
 		// объявление ролей по умолчанию
 		// используется при инсталяции модуля в платформе
 		$defRoles = array(
+			new Ab_UserRole(AntibotAction::VIEW, Ab_UserGroup::GUEST),
+			
+			new Ab_UserRole(AntibotAction::VIEW, Ab_UserGroup::ADMIN),
 			new Ab_UserRole(AntibotAction::ADMIN, Ab_UserGroup::ADMIN)
 		);
 		parent::__construct($module, $defRoles);
@@ -66,6 +75,7 @@ class AntibotPermission extends Ab_UserPermission {
 
 	public function GetRoles(){
 		return array(
+			AntibotAction::VIEW => $this->CheckAction(AntibotAction::VIEW),
 			AntibotAction::ADMIN => $this->CheckAction(AntibotAction::ADMIN)
 		);
 	}

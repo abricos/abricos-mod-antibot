@@ -1,0 +1,16 @@
+.aw-antibot i {
+	font-style: italic;
+}
+.aw-antibot .editor .relat {
+	margin-top: 10px;
+	height: 200px;
+	overflow-y: auto;
+	overflow-x: none;
+}
+.aw-antibot .editor .unm {
+	font-size: 1.2em;
+	margin-bottom: 5px;
+}
+.aw-antibot .editor .unm label {
+	font-weight: bold;
+}

@@ -13,6 +13,7 @@ $db = Abricos::$db;
 $pfx = $db->prefix;
 
 if ($updateManager->isInstall()){
+	Abricos::GetModule('antibot')->permission->Install();
 	
 	$db->query_write("
 		ALTER TABLE ".$pfx."user
@@ -28,6 +29,10 @@ if ($updateManager->isInstall()){
 		)".$charset
 	);
 	
+}
+
+if (!$updateManager->isInstall() && $updateManager->isUpdate('0.1.0.1')){
+	Abricos::GetModule('antibot')->permission->Install();
 }
 
 

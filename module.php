@@ -15,6 +15,11 @@
 class AntibotModule extends Ab_Module {
 	
 	/**
+	 * @var AntibotModule
+	 */
+	public static $instance = null;
+	
+	/**
 	 * Конструктор
 	 */
 	public function __construct(){
@@ -22,6 +27,7 @@ class AntibotModule extends Ab_Module {
 		$this->name = "antibot";
 		$this->takelink = "antibot"; // нужен для передачи списка блокировки другим сайтам
 		$this->permission = new AntibotPermission($this);
+		AntibotModule::$instance = $this;
 	}
 	
 	/**
@@ -49,7 +55,8 @@ class AntibotModule extends Ab_Module {
 		$isapp = AntibotQuery::UserIPAppend(Abricos::$db, Abricos::$user->id, $this->GetIP());
 
 		if ($isapp > 0){ 
-			// TODO: добавлена запись о юзере, значит нужно проверить всех юзеров на принадлежность к ботам 
+			// у пользовтеля новый айпишник, а может он бот?
+			$this->GetManager()->UserBotCheck();
 		}
 	}
 }

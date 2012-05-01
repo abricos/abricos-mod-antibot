@@ -39,10 +39,18 @@ class AntibotManager extends Ab_ModuleManager {
 		return null;
 	}
 	
+	public function ToArray($rows){
+		$ret = array();
+		while (($row = $this->db->fetch_array($rows))){
+			array_push($ret, $row);
+		}
+		return $ret;
+	}
+	
 	private $_checker = null;
 	private $_counter = 500;
 	
-	private function UserInfoMethod($ret, $userid){
+	private function UserInfoLoadMethod($ret, $userid){
 		// рекурсивная функция, ограничить запрос на всякий случай до 500
 		$this->_counter--;
 		if ($this->_counte < 0){ return; }
@@ -70,14 +78,11 @@ class AntibotManager extends Ab_ModuleManager {
 		$rows = AntibotQuery::UserListByIP($this->db, $nextips);
 		while (($row = $this->db->fetch_array($rows))){
 			$uid = $row['userid'];
-			$this->UserInfoMethod($ret, $uid);
+			$this->UserInfoLoadMethod($ret, $uid);
 		}
 	}
 	
-	public function UserInfo($userid){
-		if (!$this->IsAdminRole()){
-			return null;
-		}
+	private function UserInfoMethod($userid){
 		$this->_checker = new stdClass();
 		$this->_checker->ips = array();
 		$this->_checker->users = array();
@@ -87,7 +92,7 @@ class AntibotManager extends Ab_ModuleManager {
 		$ret->ips = array();
 		$ret->users = array();
 		
-		$this->UserInfoMethod($ret, $userid);
+		$this->UserInfoLoadMethod($ret, $userid);
 		
 		$users = array();
 		$rows = AntibotQuery::UserList($this->db, $ret->users);
@@ -98,17 +103,79 @@ class AntibotManager extends Ab_ModuleManager {
 			array_push($users, $row);
 		}
 		$ret->users = $users;
-				
+		
 		return $ret;
+	}
+	
+	public function UserInfo($userid){
+		if (!$this->IsAdminRole()){
+			return null;
+		}
+		return $this->UserInfoMethod($userid);
+	}
+	
+	private function BotAppendMethod($userid){
+		$info = $this->UserInfoMethod($userid);
+		
+		$author = $this->userid;
+		if ($userid == $author){
+			$author = 0;
+		}
+		
+		AntibotQuery::BotIPAppend($this->db, $userid, $author, $info->ips);
+		AntibotQuery::BotUserAppend($this->db, $userid, $author, $info->users);
 	}
 	
 	public function BotAppend($userid){
 		if (!$this->IsAdminRole()){
 			return null;
 		}
-		$info = $this->UserInfo($userid);
-		AntibotQuery::BotIPAppend($this->db, $userid, $this->userid, $info->ips);
-		AntibotQuery::BotUserAppend($this->db, $userid, $this->userid, $info->users);
+		$this->BotAppendMethod($userid);
+	}
+	
+	/**
+	 * Проверка этого пользователя на пренадлежность к ботам.
+	 * Метод вызывается когда авторизованный пользователь зашел 
+	 * с нового IP
+	 */
+	public function UserBotCheck(){
+		$ip = AntibotModule::$instance->GetIP();
+		$userid = $this->userid;
+		$isbot = !empty($this->user->info['antibotdetect']);
+		
+		$row = AntibotQuery::BotIPCheck($this->db, $ip);
+		
+		if (!empty($row) && $isbot){
+			// это бот и его IP уже в списке ботов
+			return;
+		}
+		if (empty($row) && $isbot){
+			// это бот и он засветил новый IP
+			// необходимо проверить нет ли еще юзеров с этим IP, если есть,
+			// то внести их в список ботов
+			$this->BotAppendMethod($userid);
+			return;
+		}
+		if (!empty($row)){
+			// его IP в списке ботов, значит в бан его и всех его друзей
+			$this->BotAppendMethod($userid);
+			return;
+		}
+		/*
+		// это не бот, а пока просто пользователь. 
+		// А нет ли среди его `друзей` ботов?
+		
+		$info = $this->UserInfoMethod($userid);
+		$row = AntibotQuery::UserFrendsIsBot($this->db, $info->users);
+		
+		if (empty($row)){
+			// все нормально, этот пользователь чист
+			return; 
+		}
+		
+		// а вот и новый бот, отправляйся в бан
+		$this->BotAppendMethod($userid);
+		/**/
 	}
 	
 }

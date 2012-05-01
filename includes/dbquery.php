@@ -82,6 +82,16 @@ class AntibotQuery {
 		$db->query_write($sql);
 	}
 	
+	public static function BotIPCheck(Ab_Database $db, $ip){
+		$sql = "
+			SELECT ip
+			FROM ".$db->prefix."antibot_botip
+			WHERE ip='".bkstr($ip)."'
+			LIMIT 1
+		";
+		return $db->query_first($sql);
+	}
+	
 	public static function UserSetBotFlag(Ab_Database $db, $userid) {
 		$sql = "
 			UPDATE ".$db->prefix."user
@@ -109,6 +119,31 @@ class AntibotQuery {
 				".implode(",", $awh)."
 		";
 		$db->query_write($sql);
+	}
+	
+	/**
+	 * Проверить, нет ли среди друзей пользователя боты?
+	 * 
+	 * @param Ab_Database $db
+	 * @param array $uids список друзей
+	 */
+	public static function UserFrendsIsBot(Ab_Database $db, $users){
+		if (count($users) == 0){
+			return null;
+		}
+	
+		$awh = array();
+		for ($i=0; $i<count($users); $i++){
+			$id = $users[$i]['id'];
+			array_push($awh, " userid='".bkstr($id)."'");
+		}
+		$sql = "
+			SELECT userid as id
+			FROM ".$db->prefix."user
+			WHERE antibotdetect=1 AND (".implode(" OR ", $awh).")
+			LIMIT 1
+		";
+		return $db->query_first($sql);
 	}
 	
 }

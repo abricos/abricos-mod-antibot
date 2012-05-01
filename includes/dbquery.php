@@ -64,6 +64,53 @@ class AntibotQuery {
 		";
 		return $db->query_read($sql);
 	}
+	
+	public static function BotIPAppend(Ab_Database $db, $fromuserid, $authorid, $ips){
+		if (count($ips) == 0){ return null; }
+		$awh = array();
+
+		for ($i=0; $i<count($ips); $i++){
+			$ip = $ips[$i];
+			array_push($awh, "('".bkstr($ip)."', ".bkint($fromuserid).", ".bkint($authorid).", ".TIMENOW.")");
+		}
+		
+		$sql = "
+			INSERT IGNORE INTO ".$db->prefix."antibot_botip 
+				(ip, fromuserid, authorid, dateline) VALUES
+				".implode(",", $awh)."
+		";
+		$db->query_write($sql);
+	}
+	
+	public static function UserSetBotFlag(Ab_Database $db, $userid) {
+		$sql = "
+			UPDATE ".$db->prefix."user
+			SET antibotdetect=1
+			WHERE userid=".bkint($userid)."
+			LIMIT 1
+		";
+		$db->query_write($sql);
+	}
+	
+	public static function BotUserAppend(Ab_Database $db, $fromuserid, $authorid, $users){
+		if (count($users) == 0){
+			return null;
+		}
+		$awh = array();
+		for ($i=0; $i<count($users); $i++){
+			$uid = $users[$i]['id'];
+			array_push($awh, "(".bkint($uid).", ".bkint($fromuserid).", ".bkint($authorid).", ".TIMENOW.")");
+			AntibotQuery::UserSetBotFlag($db, $uid);
+		}
+	
+		$sql = "
+			INSERT IGNORE INTO ".$db->prefix."antibot_botuser
+				(userid, fromuserid, authorid, dateline) VALUES
+				".implode(",", $awh)."
+		";
+		$db->query_write($sql);
+	}
+	
 }
 
 ?>

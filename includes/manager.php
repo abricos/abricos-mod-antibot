@@ -34,6 +34,7 @@ class AntibotManager extends Ab_ModuleManager {
 	public function AJAX($d){
 		switch($d->do){
 			case 'user': return $this->UserInfo($d->userid);
+			case 'botappend': return $this->BotAppend($d->userid);
 		}
 		return null;
 	}
@@ -82,6 +83,7 @@ class AntibotManager extends Ab_ModuleManager {
 		$this->_checker->users = array();
 		
 		$ret = new stdClass();
+		$ret->user = null;
 		$ret->ips = array();
 		$ret->users = array();
 		
@@ -90,6 +92,9 @@ class AntibotManager extends Ab_ModuleManager {
 		$users = array();
 		$rows = AntibotQuery::UserList($this->db, $ret->users);
 		while (($row = $this->db->fetch_array($rows))){
+			if ($row['id'] == $userid){
+				$ret->user = $row;
+			}
 			array_push($users, $row);
 		}
 		$ret->users = $users;
@@ -97,6 +102,14 @@ class AntibotManager extends Ab_ModuleManager {
 		return $ret;
 	}
 	
+	public function BotAppend($userid){
+		if (!$this->IsAdminRole()){
+			return null;
+		}
+		$info = $this->UserInfo($userid);
+		AntibotQuery::BotIPAppend($this->db, $userid, $this->userid, $info->ips);
+		AntibotQuery::BotUserAppend($this->db, $userid, $this->userid, $info->users);
+	}
 	
 }
 

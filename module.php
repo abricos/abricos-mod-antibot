@@ -18,7 +18,7 @@ class AntibotModule extends Ab_Module {
 	 * Конструктор
 	 */
 	public function __construct(){
-		$this->version = "0.1.0.1";
+		$this->version = "0.1.0.2";
 		$this->name = "antibot";
 		$this->takelink = "antibot"; // нужен для передачи списка блокировки другим сайтам
 		$this->permission = new AntibotPermission($this);

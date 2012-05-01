@@ -1,6 +1,9 @@
 .aw-antibot i {
 	font-style: italic;
 }
+.aw-antibot .red {
+	color: red;
+}
 .aw-antibot .editor .relat {
 	margin-top: 10px;
 	height: 200px;

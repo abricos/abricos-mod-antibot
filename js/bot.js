@@ -20,7 +20,7 @@ Component.entryPoint = function(NS){
 	
 	var BotEditorPanel = function(userid, callback){
 		this.userid = userid;
-		this.callback = callback;
+		this.callback = L.isFunction(callback) ? callback : function(){};
 		
 		BotEditorPanel.superclass.constructor.call(this, {
 			'width': '790px'
@@ -43,7 +43,7 @@ Component.entryPoint = function(NS){
 
 			var __self = this;
 			Brick.ajax('antibot', {
-				'data': {'do': 'user','userid': userid},
+				'data': {'do': 'user', 'userid': userid},
 				'event': function(request){
 					__self.renderUser(request.data);
 				}
@@ -52,12 +52,15 @@ Component.entryPoint = function(NS){
 		onClick: function(el){
 			var tp = this._TId['panel']; 
 			switch(el.id){
+			case tp['btoadd']: this.botToAppend(); return true;
+			case tp['bcancel']: this.botToCancel(); return true;
+			case tp['badd']: this.botAppend(); return true;
 			case tp['bclose']: this.close(); return true;
 			}
 		},
 		renderUser: function(d){
 			if (L.isNull(d)){ return; }
-			Brick.console(d);
+
 			var TM = this._TM, lst = "", userid = this.userid, 
 				user = null, cnt = 0;
 			
@@ -84,6 +87,31 @@ Component.entryPoint = function(NS){
 				TM.getEl('panel.unm').innerHTML = user['unm'];
 			}
 			TM.getEl('panel.cnt').innerHTML = cnt;
+		},
+		botToAppend: function(){
+			var TM = this._TM;
+			Brick.console(TM.getEl('panel.istobot'));
+			Dom.setStyle(TM.getEl('panel.istobot'), 'display', '');
+			Dom.setStyle(TM.getEl('panel.badd'), 'display', '');
+			Dom.setStyle(TM.getEl('panel.bcancel'), 'display', '');
+			Dom.setStyle(TM.getEl('panel.btoadd'), 'display', 'none');
+		},
+		botToCancel: function(){
+			var TM = this._TM;
+			Dom.setStyle(TM.getEl('panel.istobot'), 'display', 'none');
+			Dom.setStyle(TM.getEl('panel.badd'), 'display', 'none');
+			Dom.setStyle(TM.getEl('panel.bcancel'), 'display', 'none');
+			Dom.setStyle(TM.getEl('panel.btoadd'), 'display', '');
+		},
+		botAppend: function(){
+			var __self = this;
+			Brick.ajax('antibot', {
+				'data': {'do': 'botappend', 'userid': this.userid},
+				'event': function(request){
+					__self.close();
+					__self.callback();
+				}
+			});
 		}
 	});
 	

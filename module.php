@@ -50,13 +50,16 @@ class AntibotModule extends Ab_Module {
 	 * Вызывается всегда, когда зарегистрированный пользователь 
 	 * обратился к серверу
 	 */
-	public function UserDataUpdate() {
+	public function UserDataUpdate($userid = 0) {
+		if ($userid == 0){
+			$userid = Abricos::$user->id;
+		}
 		require_once 'includes/dbquery.php';
-		$isapp = AntibotQuery::UserIPAppend(Abricos::$db, Abricos::$user->id, $this->GetIP());
+		$isapp = AntibotQuery::UserIPAppend(Abricos::$db, $userid, $this->GetIP());
 
 		if ($isapp > 0){ 
 			// у пользовтеля новый айпишник, а может он бот?
-			$this->GetManager()->UserBotCheck();
+			$this->GetManager()->UserBotCheck($userid);
 		}
 	}
 }

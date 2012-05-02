@@ -138,9 +138,11 @@ class AntibotManager extends Ab_ModuleManager {
 	 * Метод вызывается когда авторизованный пользователь зашел 
 	 * с нового IP
 	 */
-	public function UserBotCheck(){
+	public function UserBotCheck($userid = 0){
 		$ip = AntibotModule::$instance->GetIP();
-		$userid = $this->userid;
+		if ($userid == 0){
+			$userid = $this->userid;
+		}
 		$isbot = !empty($this->user->info['antibotdetect']);
 		
 		$row = AntibotQuery::BotIPCheck($this->db, $ip);

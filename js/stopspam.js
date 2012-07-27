@@ -1,5 +1,5 @@
 /*
-@version $Id: opermove.js 1399 2012-02-01 07:18:22Z roosit $
+@version $Id$
 @package Abricos
 @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
 */
@@ -7,8 +7,7 @@
 var Component = new Brick.Component();
 Component.requires = { 
 	mod:[
-		{name: 'sys', files: ['container.js']},
-		{name: '{C#MODNAME}', files: ['stopspam.js']}
+		{name: 'sys', files: ['container.js']}
 	]
 };
 Component.entryPoint = function(NS){
@@ -19,24 +18,21 @@ Component.entryPoint = function(NS){
 
 	var buildTemplate = this.buildTemplate;
 	
-	var BotEditorPanel = function(userid, callback){
-		this.userid = userid;
+	var StopSpamPanel = function(callback){
 		this.callback = L.isFunction(callback) ? callback : function(){};
 		
-		BotEditorPanel.superclass.constructor.call(this, {
+		StopSpamPanel.superclass.constructor.call(this, {
 			'width': '790px'
 		});
 	};
-	YAHOO.extend(BotEditorPanel, Brick.widget.Dialog, {
+	YAHOO.extend(StopSpamPanel, Brick.widget.Dialog, {
 		initTemplate: function(){
 			return buildTemplate(this, 'panel,utable,urow,urowwait').replace('panel');
 		},
 		destroy: function(){
-			BotEditorPanel.superclass.destroy.call(this);
+			StopSpamPanel.superclass.destroy.call(this);
 		},
 		onLoad: function(){
-			var userid = this.userid;
-			
 			var TM = this._TM;
 			TM.getEl('panel.table').innerHTML = TM.replace('utable', {
 				'rows': TM.replace('urowwait')
@@ -44,7 +40,7 @@ Component.entryPoint = function(NS){
 
 			var __self = this;
 			Brick.ajax('antibot', {
-				'data': {'do': 'user', 'userid': userid},
+				'data': {'do': 'stopspam'},
 				'event': function(request){
 					__self.renderUser(request.data);
 				}
@@ -87,7 +83,7 @@ Component.entryPoint = function(NS){
 			if (!L.isNull(user)){
 				TM.getEl('panel.unm').innerHTML = user['unm'];
 			}
-			TM.getEl('panel.cnt').innerHTML = cnt;
+			// TM.getEl('panel.cnt').innerHTML = cnt;
 		},
 		botToAppend: function(){
 			var TM = this._TM;
@@ -105,8 +101,9 @@ Component.entryPoint = function(NS){
 		},
 		botAppend: function(){
 			var __self = this;
+			
 			Brick.ajax('antibot', {
-				'data': {'do': 'botappend', 'userid': this.userid},
+				'data': {'do': 'stopspamappend', 'userid': this.userid},
 				'event': function(request){
 					__self.close();
 					__self.callback();
@@ -115,5 +112,5 @@ Component.entryPoint = function(NS){
 		}
 	});
 	
-	NS.BotEditorPanel = BotEditorPanel;
+	NS.StopSpamPanel = StopSpamPanel;
 };

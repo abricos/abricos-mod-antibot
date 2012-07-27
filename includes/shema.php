@@ -65,4 +65,14 @@ if ($updateManager->isUpdate('0.1.0.2')){
 	
 }
 
+if ($updateManager->isUpdate('0.1.0.3')){
+
+	$db->query_write("
+		CREATE TABLE IF NOT EXISTS ".$pfx."antibot_ssemail (
+			`email` varchar(250) NOT NULL DEFAULT '' COMMENT 'EMail адрес',
+			UNIQUE KEY `email` (`email`)
+		)".$charset
+	);
+}
+
 ?>

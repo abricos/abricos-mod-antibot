@@ -35,6 +35,7 @@ class AntibotManager extends Ab_ModuleManager {
 		switch($d->do){
 			case 'user': return $this->UserInfo($d->userid);
 			case 'botappend': return $this->BotAppend($d->userid);
+			case 'stopspam': return $this->StopSpam();
 		}
 		return null;
 	}
@@ -178,6 +179,50 @@ class AntibotManager extends Ab_ModuleManager {
 		// а вот и новый бот, отправляйся в бан
 		$this->BotAppendMethod($userid);
 		/**/
+	}
+	
+	public function StopSpam(){
+		$this->StopSpamEmailsImport();
+
+		$users = array();
+		$rows = AntibotQuery::StopSpamCheck($this->db);
+		while (($row = $this->db->fetch_array($rows))){
+			array_push($users, $row);
+		}
+		
+		$ret = new stdClass();
+		$ret->users = $users;
+		
+		return $ret;
+	}
+	
+	public function StopSpamEmailsImport(){
+		set_time_limit(360);
+
+		$file = CWD."/cache/stopspam/emails.txt";
+		
+		if (!file_exists($file)){ return; }
+		
+		$fwrite = CWD."/cache/stopspam/temp.txt";
+		
+		$hdread = fopen($file, "r");
+		$hdwrite = fopen($fwrite, "w");
+		
+		$limit = 1000000; $i = 0;
+		while ($info = fscanf($hdread, "%s\n")) {
+			$eml = $info[0];
+    		$i++;
+    		if ($i > $limit){ 
+    			fwrite($hdwrite, $eml."\n");
+    		}else{
+    			AntibotQuery::StopSpamEmailAppend($this->db, $eml);
+    		}
+		}
+		fclose($hdread);
+		fclose($hdwrite);
+		
+		@unlink($file);
+		rename($fwrite, $file);
 	}
 	
 }

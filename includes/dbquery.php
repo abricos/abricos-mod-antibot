@@ -146,6 +146,33 @@ class AntibotQuery {
 		return $db->query_first($sql);
 	}
 	
+	public static function StopSpamEmailAppend(Ab_Database $db, $email){
+		$sql = "
+			INSERT IGNORE INTO ".$db->prefix."antibot_ssemail (email) VALUES (
+				'".bkstr($email)."'
+			)
+		";
+		$db->query_write($sql);
+	}
+	
+	public static function StopSpamCheck(Ab_Database $db){
+		$sql = "
+			SELECT 
+				u.userid as id,
+				u.username as unm,
+				u.email as eml,
+				u.joindate as jd, 
+				u.lastvisit as lv
+			FROM ".$db->prefix."user u
+			INNER JOIN ".$db->prefix."antibot_ssemail s ON u.email=s.email
+			WHERE u.antibotdetect=0
+			LIMIT 100
+		";
+		return $db->query_read($sql);
+	}
+	
+	
+	
 }
 
 ?>

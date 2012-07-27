@@ -36,6 +36,7 @@ class AntibotManager extends Ab_ModuleManager {
 			case 'user': return $this->UserInfo($d->userid);
 			case 'botappend': return $this->BotAppend($d->userid);
 			case 'stopspam': return $this->StopSpam();
+			case 'stopspamappend': return $this->StopSpamAppend($d->uids);
 		}
 		return null;
 	}
@@ -223,6 +224,12 @@ class AntibotManager extends Ab_ModuleManager {
 		
 		@unlink($file);
 		rename($fwrite, $file);
+	}
+	
+	public function StopSpamAppend($uids){
+		foreach($uids as $userid){
+			$this->BotAppend($userid);
+		}
 	}
 	
 }

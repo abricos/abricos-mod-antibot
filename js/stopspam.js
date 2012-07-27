@@ -37,6 +37,8 @@ Component.entryPoint = function(NS){
 			TM.getEl('panel.table').innerHTML = TM.replace('utable', {
 				'rows': TM.replace('urowwait')
 			});
+			
+			this.users = [];
 
 			var __self = this;
 			Brick.ajax('antibot', {
@@ -58,15 +60,12 @@ Component.entryPoint = function(NS){
 		renderUser: function(d){
 			if (L.isNull(d)){ return; }
 
-			var TM = this._TM, lst = "", userid = this.userid, 
-				user = null, cnt = 0;
+			var TM = this._TM, lst = "", cnt = 0;
+			
+			this.users = d['users'];
 			
 			for (var i=0;i<d['users'].length;i++){
 				var u = d['users'][i];
-				if (u['id'] == userid){
-					user = u;
-					continue;
-				}
 				cnt++;
 				lst += TM.replace('urow', {
 					'id': u['id'],
@@ -80,9 +79,11 @@ Component.entryPoint = function(NS){
 			TM.getEl('panel.table').innerHTML = TM.replace('utable', {
 				'rows': lst
 			});
+			/*
 			if (!L.isNull(user)){
 				TM.getEl('panel.unm').innerHTML = user['unm'];
 			}
+			/**/
 			// TM.getEl('panel.cnt').innerHTML = cnt;
 		},
 		botToAppend: function(){
@@ -102,8 +103,13 @@ Component.entryPoint = function(NS){
 		botAppend: function(){
 			var __self = this;
 			
+			var uids = [];
+			for (var i=0;i<this.users.length;i++){
+				uids[uids.length] = this.users[i].id;
+			}
+			
 			Brick.ajax('antibot', {
-				'data': {'do': 'stopspamappend', 'userid': this.userid},
+				'data': {'do': 'stopspamappend', 'uids': uids},
 				'event': function(request){
 					__self.close();
 					__self.callback();

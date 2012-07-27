@@ -183,6 +183,10 @@ class AntibotManager extends Ab_ModuleManager {
 	}
 	
 	public function StopSpam(){
+		if (!$this->IsAdminRole()){
+			return null;
+		}
+		
 		$this->StopSpamEmailsImport();
 
 		$users = array();
@@ -227,6 +231,10 @@ class AntibotManager extends Ab_ModuleManager {
 	}
 	
 	public function StopSpamAppend($uids){
+		if (!$this->IsAdminRole()){
+			return null;
+		}
+		
 		foreach($uids as $userid){
 			$this->BotAppend($userid);
 		}

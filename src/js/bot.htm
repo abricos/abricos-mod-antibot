@@ -11,19 +11,19 @@
 		</p>
 		<div id="{i#table}" class="relat"></div>
 		 
-	 	<div class="right">
+	 	<div class="text-right">
 	 		<label id="{i#istobot}" class="red" style="display: none">Операция не обратима, вы уверены в этом? </label>
-			<input id="{i#btoadd}" type="button" value="Добавить пользователя и его `друзей` в список ботов" class="btn" />
-			<input id="{i#badd}" type="button" value="Да, уверен" class="btn" style="display: none" />
-			<input id="{i#bcancel}" type="button" value="Нет, отмена" class="btn" style="display: none" />
-			<input id="{i#bclose}" type="button" value="Закрыть" class="btn" />
+			<input id="{i#btoadd}" type="button" value="Добавить пользователя и его `друзей` в список ботов" class="btn btn-default" />
+			<input id="{i#badd}" type="button" value="Да, уверен" class="btn btn-danger" style="display: none" />
+			<input id="{i#bcancel}" type="button" value="Нет, отмена" class="btn btn-default" style="display: none" />
+			<input id="{i#bclose}" type="button" value="Закрыть" class="btn btn-default" />
 		</div>
 		 
 	</div>
 </div>
 
 <!--{utable}-->
-<table class="bk-table-def">
+<table class="table table-hover">
 	<thead>
 		<tr>
 			<th>Id</th>
@@ -45,7 +45,7 @@
 </tr>
 
 <!--{urow}-->
-<tr class="row">
+<tr>
 	<td>{v#id}</td>
 	<td>{v#unm}</td>
 	<td>{v#eml}</td>

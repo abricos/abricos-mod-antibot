@@ -58,13 +58,13 @@ class AntibotManager extends Ab_ModuleManager {
     private function UserInfoLoadMethod($ret, $userid) {
         // рекурсивная функция, ограничить запрос на всякий случай до 500
         $this->_counter--;
-        if ($this->_counte < 0) {
+        if ($this->_counter < 0) {
             return;
         }
 
         $ck = $this->_checker;
 
-        if ($ck->users[$userid]) {
+        if (isset($ck->users[$userid]) && $ck->users[$userid]) {
             return;
         }
         $ck->users[$userid] = true;
@@ -75,7 +75,7 @@ class AntibotManager extends Ab_ModuleManager {
         $rows = AntibotQuery::IPListByUser($this->db, $userid);
         while (($row = $this->db->fetch_array($rows))) {
             $ip = $row['ip'];
-            if ($ck->ips[$ip]) {
+            if (isset($ck->ips[$ip]) && $ck->ips[$ip]) {
                 continue;
             }
             $ck->ips[$ip] = true;

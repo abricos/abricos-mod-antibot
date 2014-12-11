@@ -18,6 +18,8 @@ class AntibotModule extends Ab_Module {
      */
     public static $instance = null;
 
+    private $_manager = null;
+
     /**
      * Конструктор
      */

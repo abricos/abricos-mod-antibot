@@ -1,6 +1,6 @@
 # AntiBot
 
-[Russian README](https://github.com/abricos/abricos-mod-antibot/blob/master/README.RU.txt)
+[Russian README](https://github.com/abricos/abricos-mod-antibot/blob/master/README.RU.md)
 
 AntiBot module for Abricos Platform
 

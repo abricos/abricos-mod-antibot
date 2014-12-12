@@ -1,6 +1,6 @@
 # АнтиБот модуль для платформы Абрикос
 
-[English README](https://github.com/abricos/abricos-mod-antibot/blob/master/README.EN.txt)
+[English README](https://github.com/abricos/abricos-mod-antibot/blob/master/README.md)
 
 Модуль AntiBot для платформы Абрикос позволяет автоматически вычеслять бота 
 по IP и/или E-mail осуществляя поиск в локальной базе на предмет совпадения.

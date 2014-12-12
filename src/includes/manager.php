@@ -224,17 +224,24 @@ class AntibotManager extends Ab_ModuleManager {
         $hdread = fopen($file, "r");
         $hdwrite = fopen($fwrite, "w");
 
-        $limit = 1000000;
+        $limit = 100000;
         $i = 0;
+        $emails = array();
         while ($info = fscanf($hdread, "%s\n")) {
             $eml = $info[0];
             $i++;
             if ($i > $limit) {
                 fwrite($hdwrite, $eml."\n");
             } else {
-                AntibotQuery::StopSpamEmailAppend($this->db, $eml);
+                $emails[] = $eml;
+                if (count($emails) > 500) {
+                    AntibotQuery::StopSpamEmailAppend($this->db, $emails);
+                    $emails = array();
+                }
             }
         }
+        AntibotQuery::StopSpamEmailAppend($this->db, $emails);
+
         fclose($hdread);
         fclose($hdwrite);
 

@@ -151,11 +151,18 @@ class AntibotQuery {
         return $db->query_first($sql);
     }
 
-    public static function StopSpamEmailAppend(Ab_Database $db, $email) {
+    public static function StopSpamEmailAppend(Ab_Database $db, $emails) {
+        if (count($emails) < 1) {
+            return;
+        }
+        $inserts = array();
+        foreach($emails as $email){
+            $inserts[] = "('".bkstr($email)."')";
+        }
+
         $sql = "
-			INSERT IGNORE INTO ".$db->prefix."antibot_ssemail (email) VALUES (
-				'".bkstr($email)."'
-			)
+			INSERT IGNORE INTO ".$db->prefix."antibot_ssemail (email) VALUES
+			".implode(",", $inserts)."
 		";
         $db->query_write($sql);
     }

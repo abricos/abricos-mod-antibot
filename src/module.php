@@ -23,7 +23,7 @@ class AntibotModule extends Ab_Module {
     /**
      * Конструктор
      */
-    public function __construct() {
+    public function __construct(){
         $this->version = "0.1.1";
         $this->name = "antibot";
         $this->takelink = "antibot"; // нужен для передачи списка блокировки другим сайтам
@@ -34,15 +34,15 @@ class AntibotModule extends Ab_Module {
     /**
      * @return AntibotManager
      */
-    public function GetManager() {
-        if (is_null($this->_manager)) {
+    public function GetManager(){
+        if (is_null($this->_manager)){
             require_once 'includes/manager.php';
             $this->_manager = new AntibotManager($this);
         }
         return $this->_manager;
     }
 
-    public function GetIP() {
+    public function GetIP(){
         return $_SERVER['REMOTE_ADDR'];
     }
 
@@ -51,14 +51,14 @@ class AntibotModule extends Ab_Module {
      * Вызывается всегда, когда зарегистрированный пользователь
      * обратился к серверу
      */
-    public function UserDataUpdate($userid = 0) {
-        if ($userid == 0) {
+    public function UserDataUpdate($userid = 0){
+        if ($userid == 0){
             $userid = Abricos::$user->id;
         }
         require_once 'includes/dbquery.php';
         $isapp = AntibotQuery::UserIPAppend(Abricos::$db, $userid, $this->GetIP());
 
-        if ($isapp > 0) {
+        if ($isapp > 0){
             // у пользовтеля новый айпишник, а может он бот?
             $this->GetManager()->UserBotCheck($userid);
         }
@@ -72,7 +72,7 @@ class AntibotAction {
 
 class AntibotPermission extends Ab_UserPermission {
 
-    public function AntibotPermission(AntibotModule $module) {
+    public function __construct(AntibotModule $module){
         // объявление ролей по умолчанию
         // используется при инсталяции модуля в платформе
         $defRoles = array(
@@ -84,7 +84,7 @@ class AntibotPermission extends Ab_UserPermission {
         parent::__construct($module, $defRoles);
     }
 
-    public function GetRoles() {
+    public function GetRoles(){
         return array(
             AntibotAction::VIEW => $this->CheckAction(AntibotAction::VIEW),
             AntibotAction::ADMIN => $this->CheckAction(AntibotAction::ADMIN)
@@ -93,6 +93,4 @@ class AntibotPermission extends Ab_UserPermission {
 }
 
 // создать экземляр класса модуля и зарегистрировать его в ядре 
-Abricos::ModuleRegister(new AntibotModule())
-
-?>
+Abricos::ModuleRegister(new AntibotModule());

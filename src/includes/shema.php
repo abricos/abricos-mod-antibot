@@ -11,7 +11,7 @@ $updateManager = Ab_UpdateManager::$current;
 $db = Abricos::$db;
 $pfx = $db->prefix;
 
-if ($updateManager->isInstall()) {
+if ($updateManager->isInstall()){
     Abricos::GetModule('antibot')->permission->Install();
 
     $db->query_write("
@@ -29,11 +29,11 @@ if ($updateManager->isInstall()) {
 
 }
 
-if (!$updateManager->isInstall() && $updateManager->isUpdate('0.1.0.1')) {
+if (!$updateManager->isInstall() && $updateManager->isUpdate('0.1.0.1')){
     Abricos::GetModule('antibot')->permission->Install();
 }
 
-if ($updateManager->isUpdate('0.1.0.2')) {
+if ($updateManager->isUpdate('0.1.0.2')){
 
     $db->query_write("
 		CREATE TABLE IF NOT EXISTS ".$pfx."antibot_botip (
@@ -61,7 +61,7 @@ if ($updateManager->isUpdate('0.1.0.2')) {
 
 }
 
-if ($updateManager->isUpdate('0.1.0.3')) {
+if ($updateManager->isUpdate('0.1.0.3')){
 
     $db->query_write("
 		CREATE TABLE IF NOT EXISTS ".$pfx."antibot_ssemail (
@@ -69,5 +69,3 @@ if ($updateManager->isUpdate('0.1.0.3')) {
 			UNIQUE KEY `email` (`email`)
 		)".$charset);
 }
-
-?>

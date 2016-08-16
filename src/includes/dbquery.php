@@ -8,7 +8,7 @@
  */
 class AntibotQuery {
 
-    public static function UserIPAppend(Ab_Database $db, $userid, $ip) {
+    public static function UserIPAppend(Ab_Database $db, $userid, $ip){
         $sql = "
 			INSERT IGNORE INTO ".$db->prefix."antibot_userip (userid, ip) VALUES (
 				".bkint($userid).",
@@ -19,7 +19,7 @@ class AntibotQuery {
         return $db->affected_rows();
     }
 
-    public static function IPListByUser(Ab_Database $db, $userid) {
+    public static function IPListByUser(Ab_Database $db, $userid){
         $sql = "
 			SELECT ip
 			FROM ".$db->prefix."antibot_userip 
@@ -28,14 +28,14 @@ class AntibotQuery {
         return $db->query_read($sql);
     }
 
-    public static function UserListByIP(Ab_Database $db, $ip) {
+    public static function UserListByIP(Ab_Database $db, $ip){
         $ips = is_array($ip) ? $ip : array($ip);
-        if (count($ips) == 0) {
+        if (count($ips) == 0){
             return null;
         }
 
         $awh = array();
-        foreach ($ips as $ip) {
+        foreach ($ips as $ip){
             array_push($awh, " ip='".bkstr($ip)."'");
         }
         $sql = "
@@ -46,13 +46,13 @@ class AntibotQuery {
         return $db->query_read($sql);
     }
 
-    public static function UserList(Ab_Database $db, $uids) {
-        if (count($uids) == 0) {
+    public static function UserList(Ab_Database $db, $uids){
+        if (count($uids) == 0){
             return null;
         }
 
         $awh = array();
-        foreach ($uids as $id) {
+        foreach ($uids as $id){
             array_push($awh, " userid='".bkstr($id)."'");
         }
         $sql = "
@@ -68,13 +68,13 @@ class AntibotQuery {
         return $db->query_read($sql);
     }
 
-    public static function BotIPAppend(Ab_Database $db, $fromuserid, $authorid, $ips) {
-        if (count($ips) == 0) {
+    public static function BotIPAppend(Ab_Database $db, $fromuserid, $authorid, $ips){
+        if (count($ips) == 0){
             return null;
         }
         $awh = array();
 
-        for ($i = 0; $i < count($ips); $i++) {
+        for ($i = 0; $i < count($ips); $i++){
             $ip = $ips[$i];
             array_push($awh, "('".bkstr($ip)."', ".bkint($fromuserid).", ".bkint($authorid).", ".TIMENOW.")");
         }
@@ -87,7 +87,7 @@ class AntibotQuery {
         $db->query_write($sql);
     }
 
-    public static function BotIPCheck(Ab_Database $db, $ip) {
+    public static function BotIPCheck(Ab_Database $db, $ip){
         $sql = "
 			SELECT ip
 			FROM ".$db->prefix."antibot_botip
@@ -97,7 +97,7 @@ class AntibotQuery {
         return $db->query_first($sql);
     }
 
-    public static function UserSetBotFlag(Ab_Database $db, $userid) {
+    public static function UserSetBotFlag(Ab_Database $db, $userid){
         $sql = "
 			UPDATE ".$db->prefix."user
 			SET antibotdetect=1
@@ -107,12 +107,12 @@ class AntibotQuery {
         $db->query_write($sql);
     }
 
-    public static function BotUserAppend(Ab_Database $db, $fromuserid, $authorid, $users) {
-        if (count($users) == 0) {
+    public static function BotUserAppend(Ab_Database $db, $fromuserid, $authorid, $users){
+        if (count($users) == 0){
             return null;
         }
         $awh = array();
-        for ($i = 0; $i < count($users); $i++) {
+        for ($i = 0; $i < count($users); $i++){
             $uid = $users[$i]['id'];
             array_push($awh, "(".bkint($uid).", ".bkint($fromuserid).", ".bkint($authorid).", ".TIMENOW.")");
             AntibotQuery::UserSetBotFlag($db, $uid);
@@ -132,13 +132,13 @@ class AntibotQuery {
      * @param Ab_Database $db
      * @param array $uids список друзей
      */
-    public static function UserFrendsIsBot(Ab_Database $db, $users) {
-        if (count($users) == 0) {
+    public static function UserFrendsIsBot(Ab_Database $db, $users){
+        if (count($users) == 0){
             return null;
         }
 
         $awh = array();
-        for ($i = 0; $i < count($users); $i++) {
+        for ($i = 0; $i < count($users); $i++){
             $id = $users[$i]['id'];
             array_push($awh, " userid='".bkstr($id)."'");
         }
@@ -151,12 +151,12 @@ class AntibotQuery {
         return $db->query_first($sql);
     }
 
-    public static function StopSpamEmailAppend(Ab_Database $db, $emails) {
-        if (count($emails) < 1) {
+    public static function StopSpamEmailAppend(Ab_Database $db, $emails){
+        if (count($emails) < 1){
             return;
         }
         $inserts = array();
-        foreach($emails as $email){
+        foreach ($emails as $email){
             $inserts[] = "('".bkstr($email)."')";
         }
 
@@ -167,7 +167,7 @@ class AntibotQuery {
         $db->query_write($sql);
     }
 
-    public static function StopSpamCheck(Ab_Database $db) {
+    public static function StopSpamCheck(Ab_Database $db){
         $sql = "
 			SELECT 
 				u.userid as id,
@@ -182,8 +182,4 @@ class AntibotQuery {
 		";
         return $db->query_read($sql);
     }
-
-
 }
-
-?>

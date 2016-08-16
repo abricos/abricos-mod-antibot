@@ -20,18 +20,18 @@ class AntibotManager extends Ab_ModuleManager {
      */
     public static $instance = null;
 
-    public function __construct(AntibotModule $module) {
+    public function __construct(AntibotModule $module){
         parent::__construct($module);
 
         AntibotManager::$instance = $this;
     }
 
-    public function IsAdminRole() {
+    public function IsAdminRole(){
         return $this->IsRoleEnable(AntibotAction::ADMIN);
     }
 
-    public function AJAX($d) {
-        switch ($d->do) {
+    public function AJAX($d){
+        switch ($d->do){
             case 'user':
                 return $this->UserInfo($d->userid);
             case 'botappend':
@@ -44,9 +44,9 @@ class AntibotManager extends Ab_ModuleManager {
         return null;
     }
 
-    public function ToArray($rows) {
+    public function ToArray($rows){
         $ret = array();
-        while (($row = $this->db->fetch_array($rows))) {
+        while (($row = $this->db->fetch_array($rows))){
             array_push($ret, $row);
         }
         return $ret;
@@ -55,16 +55,16 @@ class AntibotManager extends Ab_ModuleManager {
     private $_checker = null;
     private $_counter = 500;
 
-    private function UserInfoLoadMethod($ret, $userid) {
+    private function UserInfoLoadMethod($ret, $userid){
         // рекурсивная функция, ограничить запрос на всякий случай до 500
         $this->_counter--;
-        if ($this->_counter < 0) {
+        if ($this->_counter < 0){
             return;
         }
 
         $ck = $this->_checker;
 
-        if (isset($ck->users[$userid]) && $ck->users[$userid]) {
+        if (isset($ck->users[$userid]) && $ck->users[$userid]){
             return;
         }
         $ck->users[$userid] = true;
@@ -73,9 +73,9 @@ class AntibotManager extends Ab_ModuleManager {
         $nextips = array();
 
         $rows = AntibotQuery::IPListByUser($this->db, $userid);
-        while (($row = $this->db->fetch_array($rows))) {
+        while (($row = $this->db->fetch_array($rows))){
             $ip = $row['ip'];
-            if (isset($ck->ips[$ip]) && $ck->ips[$ip]) {
+            if (isset($ck->ips[$ip]) && $ck->ips[$ip]){
                 continue;
             }
             $ck->ips[$ip] = true;
@@ -83,17 +83,17 @@ class AntibotManager extends Ab_ModuleManager {
             array_push($ret->ips, $ip);
             array_push($nextips, $ip);
         }
-        if (count($nextips) == 0) {
+        if (count($nextips) == 0){
             return;
         }
         $rows = AntibotQuery::UserListByIP($this->db, $nextips);
-        while (($row = $this->db->fetch_array($rows))) {
+        while (($row = $this->db->fetch_array($rows))){
             $uid = $row['userid'];
             $this->UserInfoLoadMethod($ret, $uid);
         }
     }
 
-    private function UserInfoMethod($userid) {
+    private function UserInfoMethod($userid){
         $this->_checker = new stdClass();
         $this->_checker->ips = array();
         $this->_checker->users = array();
@@ -107,8 +107,8 @@ class AntibotManager extends Ab_ModuleManager {
 
         $users = array();
         $rows = AntibotQuery::UserList($this->db, $ret->users);
-        while (($row = $this->db->fetch_array($rows))) {
-            if ($row['id'] == $userid) {
+        while (($row = $this->db->fetch_array($rows))){
+            if ($row['id'] == $userid){
                 $ret->user = $row;
             }
             array_push($users, $row);
@@ -118,18 +118,18 @@ class AntibotManager extends Ab_ModuleManager {
         return $ret;
     }
 
-    public function UserInfo($userid) {
-        if (!$this->IsAdminRole()) {
+    public function UserInfo($userid){
+        if (!$this->IsAdminRole()){
             return null;
         }
         return $this->UserInfoMethod($userid);
     }
 
-    private function BotAppendMethod($userid) {
+    private function BotAppendMethod($userid){
         $info = $this->UserInfoMethod($userid);
 
         $author = $this->userid;
-        if ($userid == $author) {
+        if ($userid == $author){
             $author = 0;
         }
 
@@ -137,8 +137,8 @@ class AntibotManager extends Ab_ModuleManager {
         AntibotQuery::BotUserAppend($this->db, $userid, $author, $info->users);
     }
 
-    public function BotAppend($userid) {
-        if (!$this->IsAdminRole()) {
+    public function BotAppend($userid){
+        if (!$this->IsAdminRole()){
             return null;
         }
         $this->BotAppendMethod($userid);
@@ -149,27 +149,27 @@ class AntibotManager extends Ab_ModuleManager {
      * Метод вызывается когда авторизованный пользователь зашел
      * с нового IP
      */
-    public function UserBotCheck($userid = 0) {
+    public function UserBotCheck($userid = 0){
         $ip = AntibotModule::$instance->GetIP();
-        if ($userid == 0) {
+        if ($userid == 0){
             $userid = $this->userid;
         }
         $isbot = !empty($this->user->info['antibotdetect']);
 
         $row = AntibotQuery::BotIPCheck($this->db, $ip);
 
-        if (!empty($row) && $isbot) {
+        if (!empty($row) && $isbot){
             // это бот и его IP уже в списке ботов
             return;
         }
-        if (empty($row) && $isbot) {
+        if (empty($row) && $isbot){
             // это бот и он засветил новый IP
             // необходимо проверить нет ли еще юзеров с этим IP, если есть,
             // то внести их в список ботов
             $this->BotAppendMethod($userid);
             return;
         }
-        if (!empty($row)) {
+        if (!empty($row)){
             // его IP в списке ботов, значит в бан его и всех его друзей
             $this->BotAppendMethod($userid);
             return;
@@ -191,8 +191,8 @@ class AntibotManager extends Ab_ModuleManager {
         /**/
     }
 
-    public function StopSpam() {
-        if (!$this->IsAdminRole()) {
+    public function StopSpam(){
+        if (!$this->IsAdminRole()){
             return null;
         }
 
@@ -200,7 +200,7 @@ class AntibotManager extends Ab_ModuleManager {
 
         $users = array();
         $rows = AntibotQuery::StopSpamCheck($this->db);
-        while (($row = $this->db->fetch_array($rows))) {
+        while (($row = $this->db->fetch_array($rows))){
             array_push($users, $row);
         }
 
@@ -210,12 +210,12 @@ class AntibotManager extends Ab_ModuleManager {
         return $ret;
     }
 
-    public function StopSpamEmailsImport() {
+    public function StopSpamEmailsImport(){
         set_time_limit(360);
 
         $file = CWD."/cache/stopspam/emails.txt";
 
-        if (!file_exists($file)) {
+        if (!file_exists($file)){
             return;
         }
 
@@ -227,14 +227,14 @@ class AntibotManager extends Ab_ModuleManager {
         $limit = 100000;
         $i = 0;
         $emails = array();
-        while ($info = fscanf($hdread, "%s\n")) {
+        while ($info = fscanf($hdread, "%s\n")){
             $eml = $info[0];
             $i++;
-            if ($i > $limit) {
+            if ($i > $limit){
                 fwrite($hdwrite, $eml."\n");
             } else {
                 $emails[] = $eml;
-                if (count($emails) > 500) {
+                if (count($emails) > 500){
                     AntibotQuery::StopSpamEmailAppend($this->db, $emails);
                     $emails = array();
                 }
@@ -249,16 +249,13 @@ class AntibotManager extends Ab_ModuleManager {
         rename($fwrite, $file);
     }
 
-    public function StopSpamAppend($uids) {
-        if (!$this->IsAdminRole()) {
+    public function StopSpamAppend($uids){
+        if (!$this->IsAdminRole()){
             return null;
         }
 
-        foreach ($uids as $userid) {
+        foreach ($uids as $userid){
             $this->BotAppend($userid);
         }
     }
-
 }
-
-?>
